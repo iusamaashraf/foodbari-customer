@@ -12,6 +12,7 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: RoundedAppBar(
+        isLeading: true,
         // bgColor: Colors.white,
         titleText: 'Notification',
         textColor: blackColor,

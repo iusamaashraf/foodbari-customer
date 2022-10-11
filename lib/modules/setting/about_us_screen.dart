@@ -8,7 +8,10 @@ class AboutUsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: RoundedAppBar(titleText: 'About Us'),
+      appBar: RoundedAppBar(
+        titleText: 'About Us',
+        isLeading: true,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: const [

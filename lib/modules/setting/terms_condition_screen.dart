@@ -8,7 +8,7 @@ class TermsConditionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: RoundedAppBar(titleText: 'Teams & Condition'),
+      appBar: RoundedAppBar(titleText: 'Teams & Condition', isLeading: true),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [

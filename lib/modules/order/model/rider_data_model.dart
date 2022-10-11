@@ -18,12 +18,11 @@ class RiderDataModel {
     this.rider_phone,
   });
   RiderDataModel.fromSnapshot(DocumentSnapshot data) {
-    id = data['id'];
-
+    id = data.id;
     profileImage = data["profileImage"] ?? "";
     rider_address = data['delivery_boy_address'] ?? '';
     rider_email = data['email'] ?? '';
-    rider_location = data['location'] ?? '';
+    rider_location = data['location'] ?? const GeoPoint(0.0, 0.0);
     rider_name = data['name'] ?? '';
     rider_phone = data['phoneNo'] ?? '';
   }

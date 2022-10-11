@@ -1,77 +1,34 @@
 {
   "project_info": {
-    "project_number": "841926328144",
-    "project_id": "foodbari-f854f",
-    "storage_bucket": "foodbari-f854f.appspot.com"
+    "project_number": "465635087998",
+    "project_id": "deliveryapp-f3bed",
+    "storage_bucket": "deliveryapp-f3bed.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:841926328144:android:f21bb3c3801b8d2c9f3655",
+        "mobilesdk_app_id": "1:465635087998:android:8c36950a7024bdc9786a2f",
         "android_client_info": {
           "package_name": "com.app.customer.foodbaricustomer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "841926328144-43l4elemd7dn00i27a744hfsb2uptu77.apps.googleusercontent.com",
+          "client_id": "465635087998-j3f1v7oq1pfelfo45gvpgd6gscm07bpf.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCjgcoifQ15ZDKbPuaH6RuAb6SNjTCVgvs"
+          "current_key": "AIzaSyDiBvrkY5t4cZxx8pSBt3fgo_AKysYO8eI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "841926328144-43l4elemd7dn00i27a744hfsb2uptu77.apps.googleusercontent.com",
+              "client_id": "465635087998-j3f1v7oq1pfelfo45gvpgd6gscm07bpf.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "841926328144-9noug0ar7c0je00alqgeqp37lib5i8bs.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.foodbariDeliverApp"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:841926328144:android:4384334457cbc91d9f3655",
-        "android_client_info": {
-          "package_name": "com.example.foodbari_deliver_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "841926328144-43l4elemd7dn00i27a744hfsb2uptu77.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCjgcoifQ15ZDKbPuaH6RuAb6SNjTCVgvs"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "841926328144-43l4elemd7dn00i27a744hfsb2uptu77.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "841926328144-9noug0ar7c0je00alqgeqp37lib5i8bs.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.foodbariDeliverApp"
-              }
             }
           ]
         }

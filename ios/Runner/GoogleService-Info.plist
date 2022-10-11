@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>841926328144-den6ha26msuiels259am2rh8ub79t03d.apps.googleusercontent.com</string>
+	<string>465635087998-ceeg16g1ijfg3na8qgf7g0i59hi0kurt.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.841926328144-den6ha26msuiels259am2rh8ub79t03d</string>
+	<string>com.googleusercontent.apps.465635087998-ceeg16g1ijfg3na8qgf7g0i59hi0kurt</string>
 	<key>API_KEY</key>
-	<string>AIzaSyBZTzqCysc7AzFZIT7-Cb0WG8R9e0VCayg</string>
+	<string>AIzaSyDdyfqgaIsEfr-8EP4bCpWRMfvV2ggDeaA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>841926328144</string>
+	<string>465635087998</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.app.customer.foodbaricustomer</string>
 	<key>PROJECT_ID</key>
-	<string>foodbari-f854f</string>
+	<string>deliveryapp-f3bed</string>
 	<key>STORAGE_BUCKET</key>
-	<string>foodbari-f854f.appspot.com</string>
+	<string>deliveryapp-f3bed.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:841926328144:ios:f56a7b2de07860869f3655</string>
+	<string>1:465635087998:ios:e2a2a9fa689bdf97786a2f</string>
 </dict>
 </plist>

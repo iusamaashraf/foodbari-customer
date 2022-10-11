@@ -25,7 +25,7 @@ class RoundedAppBar extends AppBar {
     this.textColor = Colors.white,
     this.bgColor = redColor,
     this.shapeBorder = const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(bottomRight: Radius.circular(30)),
+      borderRadius: BorderRadius.only(bottomRight: Radius.circular(0)),
     ),
     this.onTap,
     this.actionButtons,
@@ -37,7 +37,7 @@ class RoundedAppBar extends AppBar {
           shape: shapeBorder,
           leading: isLeading
               ? AppbarLeading(isBorder: isBorder, borderRadius: borderRadius)
-              : SizedBox(),
+              : const SizedBox(),
           iconTheme: const IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
               color: textColor, fontSize: 18, fontWeight: FontWeight.w600),

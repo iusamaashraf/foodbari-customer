@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:foodbari_deliver_app/location_picker/location_picker_page.dart';
+import 'package:foodbari_deliver_app/location_picker/select_location.dart';
 import 'package:foodbari_deliver_app/map_screen.dart';
 import 'package:foodbari_deliver_app/root.dart';
 import 'package:get/get.dart';
@@ -18,16 +20,15 @@ class _SplashScreenState extends State<AnimatedSplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late Animation<double> animation;
-
+  final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   Future startTime() async {
     var _duration = const Duration(seconds: 3);
     return Timer(_duration, navigationPage);
   }
 
   void navigationPage() {
-    // Get.offAll(() => MapScreen());
+    // Get.to(() => LocationSearch(scaffoldKey: _scaffoldkey, onSelected: () {}));
     Get.offAll(() => RootCustomer());
-    // Navigator.of(context).pushReplacementNamed(RouteNames.signInScreen);
   }
 
   @override

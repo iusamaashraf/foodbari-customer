@@ -32,6 +32,7 @@ class AppbarLeading extends StatelessWidget {
           ),
           child: Icon(
             Platform.isAndroid ? Icons.arrow_back : Icons.arrow_back_ios_new,
+            size: 15,
             color: blackColor,
           ),
         ),

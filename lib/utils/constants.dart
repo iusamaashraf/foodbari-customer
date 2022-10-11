@@ -49,3 +49,4 @@ final gredientColors = [
   [const Color(0xff019BFE), const Color(0xff0077C1)],
   [const Color(0xff161632), const Color(0xff3D364E)],
 ];
+const String apiKey = "AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0";

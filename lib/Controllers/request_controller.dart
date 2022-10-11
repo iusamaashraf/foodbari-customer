@@ -6,13 +6,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodbari_deliver_app/Models/all_request_model.dart';
+import 'package:foodbari_deliver_app/Models/place_autocomplete_response.dart';
 import 'package:foodbari_deliver_app/Models/rating_model.dart';
 import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
 import 'package:foodbari_deliver_app/modules/authentication/models/customer_model.dart';
 import 'package:foodbari_deliver_app/modules/order/model/get_offer_model.dart';
 import 'package:foodbari_deliver_app/modules/order/model/rider_data_model.dart';
+import 'package:foodbari_deliver_app/modules/order/request_sent_success_page.dart';
 import 'package:foodbari_deliver_app/utils/utils.dart';
 import 'package:get/get.dart';
+import 'package:google_geocoding/google_geocoding.dart';
+import 'package:http/http.dart';
 
 class RequestController extends GetxController {
   File? requestImage;
@@ -28,17 +32,32 @@ class RequestController extends GetxController {
   List<GetRequestModel>? get getRequest => getRequestModel.value;
   final firstore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
-  Future<void> submitRequest(context) async {
-    Utils.showLoadingDialog(context, text: "Sending Request...");
+  CustomerController userController = Get.put(CustomerController());
+  RxString token = ''.obs;
+  Future<void> submitRequest({
+    context,
+    pickAddress,
+    dropAddress,
+    GeoPoint? pickLocation,
+    GeoPoint? dropLocation,
+    double? distance,
+    double? deliveryFee,
+  }) async {
+    var url = "";
+    var googleGeoCoding =
+        Utils.showLoadingDialog(context, text: "Sending Request...");
     try {
       final ref = FirebaseStorage.instance
           .ref()
           .child('customer-request-images')
           .child(customerController.auth.currentUser!.uid);
-      await ref.putFile(requestImage!);
-      final url = await ref.getDownloadURL();
+
+      if (requestImage != null) {
+        await ref.putFile(requestImage!);
+        url = await ref.getDownloadURL();
+      }
       Map<String, dynamic> requestData = {
-        'request_image': url,
+        'request_image': requestImage == null ? '' : url,
         'title': titleController.text,
         'description': descriptionController.text,
         'price': double.parse(priceController.text),
@@ -55,35 +74,42 @@ class RequestController extends GetxController {
                 ""
             ? "https://cdn.techjuice.pk/wp-content/uploads/2015/02/wallpaper-for-facebook-profile-photo-1024x645.jpg"
             : customerController.customerModel.value!.profileImage,
-        "delivery_boy_id": ""
+        "delivery_boy_id": "",
+        "pickup_address": pickAddress,
+        "drop_address": dropAddress,
+        "pickup_location": pickLocation,
+        "drop_location": dropLocation,
+        "distance": distance,
+        "delivery_fee": deliveryFee,
       };
       await _firestore.collection('all_requests').add(requestData);
       Get.back();
-      Utils.showCustomDialog(context,
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: SizedBox(
-              height: 100,
-              child: Column(
-                children: [
-                  const Icon(
-                    CupertinoIcons.checkmark_circle_fill,
-                    color: Colors.green,
-                  ),
-                  const Text("Request Send"),
-                  TextButton(
-                      onPressed: () {
-                        requestImage = null;
-                        titleController.clear();
-                        descriptionController.clear();
-                        priceController.clear();
-                        Get.back();
-                      },
-                      child: const Text("Ok"))
-                ],
-              ),
-            ),
-          ));
+      Get.to(() => RequestSentSuccessPage());
+      // Utils.showCustomDialog(context,
+      //     child: Padding(
+      //       padding: const EdgeInsets.all(12.0),
+      //       child: SizedBox(
+      //         height: 100,
+      //         child: Column(
+      //           children: [
+      //             const Icon(
+      //               CupertinoIcons.checkmark_circle_fill,
+      //               color: Colors.green,
+      //             ),
+      //             const Text("Request Send"),
+      //             TextButton(
+      //                 onPressed: () {
+      //                   requestImage = null;
+      //                   titleController.clear();
+      //                   descriptionController.clear();
+      //                   priceController.clear();
+      //                   Get.back();
+      //                 },
+      //                 child: const Text("Ok"))
+      //           ],
+      //         ),
+      //       ),
+      //     ));
     } catch (e) {
       Get.back();
       Get.snackbar("Error", e.toString().split("] ").last);
@@ -181,6 +207,24 @@ class RequestController extends GetxController {
     });
   }
 
+  // sendNotification(
+  //   String content,
+  //   deliveryBoyName,
+  //   title,
+  // ) async {
+  //   // print("tokenId is:${userController.customerModel.value!.tokenId!}");
+  //   OneSignal.shared.postNotification(OSCreateNotification(
+  //     additionalData: {
+  //       "delivery_boy_name": "Dear $deliveryBoyName",
+  //       "title": "your request $title has accepted",
+  //       "tokenId": userController.customerModel.value!.tokenId!,
+  //     },
+  //     heading: "Dear $deliveryBoyName",
+  //     content: "Hello there ",
+  //     playerIds: [userController.customerModel.value!.tokenId!],
+  //   ));
+  // }
+
   Rxn<RiderDataModel> customerModel = Rxn<RiderDataModel>();
 
   Future<void> getRiderDetails(String id) async {
@@ -276,7 +320,7 @@ class RequestController extends GetxController {
       for (var element in query.docs) {
         retVal.add(AllRequestModel.fromSnapshot(element));
       }
-      print("aa length is${retVal.length.toString()}");
+      print("pending length is${retVal.length.toString()}");
       return retVal;
     });
   }
@@ -325,6 +369,30 @@ class RequestController extends GetxController {
         retVal.add(AllRequestModel.fromSnapshot(element));
       }
       print("comple length is${retVal.length.toString()}");
+      return retVal;
+    });
+  }
+
+  // <=============================== Getting sending requests ==============================>
+  void sendingRequestsFunc() {
+    sendingList.bindStream(sendingrequestStatus());
+  }
+
+  Rxn<List<AllRequestModel>> sendingList = Rxn<List<AllRequestModel>>();
+  List<AllRequestModel>? get sending => sendingList.value;
+  Stream<List<AllRequestModel>> sendingrequestStatus() {
+    return FirebaseFirestore.instance
+        .collection('all_requests')
+        .where("customer_id",
+            isEqualTo: Get.find<CustomerController>().user!.uid)
+        .where("status", isEqualTo: '')
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<AllRequestModel> retVal = [];
+      for (var element in query.docs) {
+        retVal.add(AllRequestModel.fromSnapshot(element));
+      }
+      print("sending length is${retVal.length.toString()}");
       return retVal;
     });
   }

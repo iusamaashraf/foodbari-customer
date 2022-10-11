@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     orderController.pendingFunc();
     orderController.completedFunc();
     orderController.cancelledFunc();
+    orderController.sendingRequestsFunc();
     orderController.getOrderStatus("Completed");
     super.initState();
   }

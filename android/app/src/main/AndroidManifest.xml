@@ -2,6 +2,7 @@
     package="com.app.customer.foodbaricustomer">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    
    <application
         android:label="foodbari_deliver_app"
         android:name="${applicationName}"
@@ -33,6 +34,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
         <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyAtM8lId-fAURr8doyrJa1CiBjN_2k-lp4"/>
+               android:value="AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0"/>
     </application>
 </manifest>

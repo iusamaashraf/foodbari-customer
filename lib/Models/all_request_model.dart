@@ -16,6 +16,13 @@ class AllRequestModel {
   bool? isCompleted;
   String? title;
   int? noOfRequest;
+  String? tokenId;
+  String? pickAddress;
+  String? dropAddress;
+  GeoPoint? pickupLocation;
+  GeoPoint? dropLocation;
+  double? distance;
+  double? deliveryfee;
   AllRequestModel({
     this.isCompleted,
     this.noOfRequest,
@@ -32,6 +39,13 @@ class AllRequestModel {
     this.status,
     this.time,
     this.title,
+    this.tokenId,
+    this.pickAddress,
+    this.dropAddress,
+    this.pickupLocation,
+    this.dropLocation,
+    this.distance,
+    this.deliveryfee,
   });
   AllRequestModel.fromSnapshot(DocumentSnapshot data) {
     id = data.id;
@@ -49,5 +63,12 @@ class AllRequestModel {
     status = data['status'] ?? false;
     time = data['time'] ?? Timestamp.now();
     title = data['title'] ?? '';
+    pickAddress = data['pickup_address'] ?? '';
+    dropAddress = data['drop_address'] ?? '';
+    pickupLocation = data['pickup_location'] ?? const GeoPoint(0.0, 0.0);
+    dropLocation = data['drop_location'] ?? const GeoPoint(0.0, 0.0);
+    distance = data['distance'] ?? 0.0;
+    deliveryfee = data['delivery_fee'] ?? 0.0;
+    //  / tokenId = data['tokenId'] ?? '';
   }
 }

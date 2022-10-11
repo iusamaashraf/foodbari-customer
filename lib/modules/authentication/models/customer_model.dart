@@ -8,14 +8,17 @@ class CustomerModel {
   GeoPoint? location;
   String? address;
   String? profileImage;
-  CustomerModel(
-      {this.id,
-      this.name,
-      this.email,
-      this.phone,
-      this.location,
-      this.profileImage,
-      this.address});
+  String? tokenId;
+  CustomerModel({
+    this.id,
+    this.name,
+    this.email,
+    this.phone,
+    this.location,
+    this.profileImage,
+    this.address,
+    this.tokenId,
+  });
 
   CustomerModel.fromSnapshot(DocumentSnapshot data) {
     id = data.id;
@@ -25,6 +28,7 @@ class CustomerModel {
     phone = data['phone'] ?? '';
     location = data['location'] ?? const GeoPoint(0, 0);
     profileImage = data['profileImage'] ?? '';
+    // tokenId = data['tokenId'] ?? '';
   }
 }
 //import 'package:cloud_firestore/cloud_firestore.dart';
