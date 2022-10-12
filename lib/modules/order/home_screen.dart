@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:badges/badges.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -61,7 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
     'Cancelled',
   ];
   RxDouble rating = 0.0.obs;
-
+  double? pickLat;
+  double? pickLng;
+  double? dropLat;
+  double? dropLng;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -206,8 +212,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (RequestController orderController) {
                       if (orderController.orderStatus == null ||
                           orderController.orderStatus!.isEmpty) {
-                        return const Center(
-                          child: Text("No order found"),
+                        return SizedBox(
+                          height: size.height * 0.2,
+                          width: size.width * 1,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: size.height * 0.15,
+                              ),
+                              Image.asset(
+                                "assets/images/no_data.png",
+                                height: size.height * 0.2,
+                              ),
+                              SizedBox(
+                                height: size.height * 0.03,
+                              ),
+                              Text("No Order Found",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .subtitle1!
+                                      .copyWith(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600)),
+                            ],
+                          ),
                         );
                       } else {
                         return ListView.builder(
@@ -307,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       style: GoogleFonts.roboto(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontSize: 14,
+                                                          fontSize: 16,
                                                           height: 1,
                                                           color: Colors.grey),
                                                     ),
@@ -401,8 +429,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 )
                                               : const CircleAvatar(
                                                   radius: 20,
-                                                  backgroundImage: AssetImage(
-                                                      "assets/images/profile.jpg")),
+                                                  backgroundImage: NetworkImage(
+                                                      "https://cdn.techjuice.pk/wp-content/uploads/2015/02/wallpaper-for-facebook-profile-photo-1024x645.jpg"),
+                                                ),
                                           const SizedBox(height: 1),
                                         ],
                                       ),
@@ -555,10 +584,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                       () => Row(
                                                                         children: [
                                                                           const Icon(
-                                                                              Icons.star,
-                                                                              color: Colors.amber),
+                                                                            Icons.star,
+                                                                            color:
+                                                                                redColor,
+                                                                            size:
+                                                                                20,
+                                                                          ),
                                                                           Text(
-                                                                            "${((orderController.ratingValue.value) / orderController.rating!.length).toStringAsFixed(1)}",
+                                                                            ((orderController.ratingValue.value) / orderController.rating!.length).toStringAsFixed(1),
                                                                             style:
                                                                                 Theme.of(context).textTheme.subtitle1!.copyWith(color: Colors.grey, fontWeight: FontWeight.normal),
                                                                           ),
@@ -629,10 +662,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           'See on map'),
                                                                       IconButton(
                                                                         onPressed:
-                                                                            () {
-                                                                          Get.to(() => MapScreen(
-                                                                              destinationLat: orderController.customerModel.value!.rider_location!.latitude,
-                                                                              destinationLng: orderController.customerModel.value!.rider_location!.longitude));
+                                                                            () async {
+                                                                          await orderController
+                                                                              .getDetailRider(orderController.orderStatus![index].delivery_boy_id!)
+                                                                              .then((value) {
+                                                                            requestController.distance(
+                                                                              pickLat: orderController.orderStatus![index].pickupLocation!.latitude,
+                                                                              pickLng: orderController.orderStatus![index].pickupLocation!.longitude,
+                                                                              dropLat: orderController.orderStatus![index].dropLocation!.latitude,
+                                                                              dropLng: orderController.orderStatus![index].dropLocation!.longitude,
+                                                                            );
+                                                                            // print("object:${orderController.orderStatus![index].pickupLocation!.latitude}");
+                                                                            // print("object1:${orderController.orderStatus![index].pickupLocation!.longitude}");
+                                                                            Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                    builder: (_) => MapScreen(
+                                                                                          pickLat: orderController.orderStatus![index].pickupLocation!.latitude,
+                                                                                          pickLng: orderController.orderStatus![index].pickupLocation!.longitude,
+                                                                                          dropLat: orderController.orderStatus![index].dropLocation!.latitude,
+                                                                                          dropLng: orderController.orderStatus![index].dropLocation!.longitude,
+                                                                                          modelData: orderController.customerModel.value!,
+                                                                                          rating: orderController.ratingValue.value,
+                                                                                        )));
+                                                                          });
                                                                         },
                                                                         icon: const Icon(
                                                                             Icons.map),
@@ -655,18 +708,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           mainAxisAlignment:
                                                                               MainAxisAlignment.end,
                                                                           children: [
-                                                                            // TextButton(
-                                                                            //     onPressed: () {
-                                                                            //       Get.back();
-                                                                            //     },
-                                                                            //     child: const Text("Cancel")),
+                                                                            TextButton(
+                                                                                onPressed: () {
+                                                                                  orderController.cancelOffer(orderController.orderStatus![index].id!);
+                                                                                  Get.back();
+                                                                                },
+                                                                                child: const Text("Cancel")),
                                                                             TextButton(
                                                                                 onPressed: () {
                                                                                   orderController.completeDelivery(orderStatus.id!);
                                                                                   Get.back();
                                                                                   // Utils().showRatingAppDialog(context);
                                                                                   final _ratingDialog = RatingDialog(
-                                                                                    starColor: Colors.amber,
+                                                                                    starColor: redColor,
                                                                                     // ratingColor: Colors.amber,
                                                                                     title: const Text('Feedback to rider'),
 
@@ -913,7 +967,8 @@ class _HomeScreenState extends State<HomeScreen> {
           print("index is here : $initialLabelIndex");
           // widget.onChange(initialLabelIndex);
         }),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 400),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: initialLabelIndex == key ? redColor : Colors.white,

@@ -32,6 +32,7 @@ import 'constants.dart';
 class MyTheme {
   static final borderRadius = BorderRadius.circular(4);
   static final theme = ThemeData(
+    fontFamily: "Poppins",
     brightness: Brightness.light,
     primaryColor: primaryColor,
     scaffoldBackgroundColor: primaryColor,
@@ -46,6 +47,7 @@ class MyTheme {
     ),
     textTheme: GoogleFonts.robotoTextTheme(
       const TextTheme(
+        
         caption: TextStyle(fontSize: 12, height: 1.83),
         bodyText1: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         bodyText2: TextStyle(fontSize: 14),

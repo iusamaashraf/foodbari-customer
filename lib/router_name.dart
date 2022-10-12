@@ -12,7 +12,6 @@ import 'modules/message/message_screen.dart';
 import 'modules/notification/notigication_screen.dart';
 import 'modules/onboarding/onboarding_screen.dart';
 import 'modules/order/model/product_model.dart';
-import 'modules/order/order_details_page.dart';
 import 'modules/order/order_tracking_screen.dart';
 import 'modules/profile/profile_edit_screen.dart';
 import 'modules/setting/about_us_screen.dart';

@@ -28,7 +28,7 @@ class MyBottomNavigationBar extends StatelessWidget {
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
-                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 0)]),
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 12)]),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceAround,

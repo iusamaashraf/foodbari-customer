@@ -27,6 +27,7 @@ class GetRequestModel {
     this.phone,
   });
   GetRequestModel.fromSnapshot(DocumentSnapshot data) {
+    print("Delivery boy id is:${data['delivery_boy_id']}");
     id = data.id;
     address = data['address'] ?? '';
     delivery_boy_id = data['delivery_boy_id'] ?? '';
@@ -36,5 +37,6 @@ class GetRequestModel {
     name = data['name'] ?? '';
     offer_id = data['offer_id'] ?? '';
     phone = data['phone'] ?? '';
+    print("Delivery boy id is:$address");
   }
 }

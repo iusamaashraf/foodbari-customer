@@ -27,7 +27,7 @@ class ShowDeliveryBoyDetail extends StatelessWidget {
           width: MediaQuery.of(context).size.width,
           child: Obx(
             () => requestController.getRequest == null
-                ?const Center(
+                ? const Center(
                     child: CircularProgressIndicator(),
                   )
                 : ListView.builder(

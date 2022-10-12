@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:foodbari_deliver_app/location_picker/location_picker_page.dart';
 import 'package:foodbari_deliver_app/location_picker/select_location.dart';
 import 'package:foodbari_deliver_app/map_screen.dart';
 import 'package:foodbari_deliver_app/root.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import '../../utils/constants.dart';
 import '../../utils/k_images.dart';
 import '../../widgets/custom_image.dart';
@@ -22,7 +24,7 @@ class _SplashScreenState extends State<AnimatedSplashScreen>
   late Animation<double> animation;
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   Future startTime() async {
-    var _duration = const Duration(seconds: 3);
+    var _duration = const Duration(seconds: 4);
     return Timer(_duration, navigationPage);
   }
 
@@ -67,96 +69,45 @@ class _SplashScreenState extends State<AnimatedSplashScreen>
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
+        alignment: Alignment.center,
         fit: StackFit.expand,
         children: <Widget>[
-          Container(
-            width: size.width,
-            height: size.height,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [redColor, redColor],
-              ),
-            ),
-            child: Stack(
-              children: [
-                const SizedBox(),
-                Positioned(
-                  left: size.width * 0.4,
-                  top: 0,
-                  child: SafeArea(
-                    child: CircleAvatar(
-                      radius: 280,
-                      backgroundColor: Colors.white.withOpacity(0.09),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 10,
-                  bottom: -25,
-                  child: SafeArea(
-                    child: CircleAvatar(
-                      radius: 280,
-                      backgroundColor: Colors.white.withOpacity(0.09),
-                    ),
-                  ),
-                )
+          Positioned(
+              top: -size.height * 0.2,
+              left: -size.width * 0.2,
+              child: CircleAvatar(
+                radius: size.width * 0.4,
+                backgroundColor: Colors.redAccent,
+              )),
+          Positioned(
+              bottom: -size.height * 0.6,
+              // left: -size.width*0.2,
+              child: CircleAvatar(
+                radius: size.width * 0.8,
+                backgroundColor: Colors.redAccent,
+              )),
+          Positioned(
+            top: size.height * 0.2,
+            left: size.width * 0,
+            right: size.width * 0.1,
+            child: Lottie.asset("assets/images/delivery_boy.json"),
+          ),
+          Positioned(
+            top: size.height * 0.65,
+            child: AnimatedTextKit(
+              animatedTexts: [
+                WavyAnimatedText('Delivery app',
+                    textStyle: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: size.height * 0.03,
+                        fontWeight: FontWeight.w500)),
               ],
+              isRepeatingAnimation: true,
+              onTap: () {
+                print("Tap Event");
+              },
             ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              const SizedBox(width: double.infinity),
-              Center(
-                child: CustomImage(
-                  path: Kimages.logoColor,
-                  width: animation.value * 260,
-                  height: animation.value * 260,
-                  // height:  max((animation.value * 260), 100),
-                ),
-              ),
-              // const SizedBox(height: 20),
-              // Center(
-              //   child: Text(
-              //     Kstrings.appName,
-              //     style: GoogleFonts.roboto(
-              //       fontSize: 50,
-              //       height: 1,
-              //       color: Colors.white,
-              //       fontWeight: FontWeight.w900,
-              //     ),
-              //   ),
-              // ),
-              // Row(
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   mainAxisAlignment: MainAxisAlignment.end,
-              //   children: [
-              //     Container(
-              //       height: 4,
-              //       width: 50,
-              //       margin: const EdgeInsets.only(right: 4),
-              //       decoration: BoxDecoration(
-              //         color: Colors.white,
-              //         borderRadius: BorderRadius.circular(4),
-              //       ),
-              //     ),
-              //     Text(
-              //       'Delivery Man',
-              //       style: GoogleFonts.roboto(
-              //         fontSize: 30,
-              //         height: 1,
-              //         color: Colors.white,
-              //         fontWeight: FontWeight.w900,
-              //       ),
-              //     ),
-              //     const SizedBox(width: 30),
-              //   ],
-              // ),
-            ],
-          ),
+          )
         ],
       ),
     );

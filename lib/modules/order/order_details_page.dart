@@ -86,14 +86,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           SizedBox(
             height: size.height * 0.05,
           ),
-          Row(
-            children: [
-              tabs(
-                'Sent',
-                0,
-              ),
-              tabs('Received', 1),
-            ],
+          Padding(
+            padding:  EdgeInsets.symmetric(horizontal: size.width*0.02),
+            child: Row(
+              children: [
+                tabs(
+                  'Sent',
+                  0,
+                ),
+                tabs('Received', 1),
+              ],
+            ),
           ),
           Expanded(
             child: _pages[selectedIndex],
@@ -111,10 +114,11 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
           selectedIndex = index;
         });
       },
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
         padding: const EdgeInsets.all(8),
         // height: size.height * 0.03,
-        width: size.width * 0.5,
+        width: size.width * 0.48,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
                 topRight: index == 1
@@ -129,8 +133,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 bottomLeft: index == 0
                     ? const Radius.circular(8)
                     : const Radius.circular(0)),
-            color: Colors.red,
-            border: Border.all(color: primaryColor)),
+            color:selectedIndex==index? Colors.red:null,
+            border: Border.all(color: Colors.red)),
         child: Center(
           child: Text(text,
               style: Theme.of(context).textTheme.subtitle1!.copyWith(

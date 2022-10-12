@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../dummy_data/all_dymmy_data.dart';
-import '../../utils/constants.dart';
 import '../../widgets/rounded_app_bar.dart';
 import 'component/empty_notification.dart';
 import 'component/notification_list.dart';
@@ -15,7 +14,7 @@ class NotificationScreen extends StatelessWidget {
         isLeading: true,
         // bgColor: Colors.white,
         titleText: 'Notification',
-        textColor: blackColor,
+        textColor: Colors.white,
       ),
 
       ///dumy dala list notificationList

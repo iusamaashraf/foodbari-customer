@@ -9,6 +9,7 @@ import 'package:foodbari_deliver_app/utils/constants.dart';
 import 'package:foodbari_deliver_app/widgets/primary_button.dart';
 import 'package:foodbari_deliver_app/widgets/rounded_app_bar.dart';
 import 'package:get/get.dart';
+import 'package:google_place/google_place.dart';
 
 class RecievedRequestPage extends StatefulWidget {
   const RecievedRequestPage({Key? key}) : super(key: key);
@@ -72,114 +73,142 @@ class _RecievedRequestPageState extends State<RecievedRequestPage> {
         body: GetX<RequestController>(
             init: Get.put<RequestController>(RequestController()),
             builder: (RequestController controller) {
-              if (controller.offers == null) {
-                return const Center(child: Text('No response receive yet.'));
+              if (controller.offers == null || controller.offers!.isEmpty) {
+                return SizedBox(
+                  // height: size.height * 0.4,
+                  width: size.width * 1,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.15,
+                      ),
+                      Image.asset(
+                        "assets/images/no_data.png",
+                        height: size.height * 0.2,
+                      ),
+                      SizedBox(
+                        height: size.height * 0.03,
+                      ),
+                      Text("No received offer found yet ...",
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle1!
+                              .copyWith(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                );
               } else {
                 return ListView.builder(
+                    padding: EdgeInsets.only(
+                        top: size.height * 0.00, bottom: size.height * 0.1),
                     itemCount: controller.offers!.length,
                     itemBuilder: (context, index) {
                       var offer = controller.offers![index];
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        elevation: 3,
-                        child: ListTile(
-                          onTap: () async {
-                            await controller.getDetailRider(offer.id!);
-                            Get.to(() => ShowDeliveryBoyDetail());
-                          },
-                          trailing: CircleAvatar(
-                            radius: size.height * 0.015,
-                            backgroundColor: redColor,
-                            child: Center(
-                              child: Text(
-                                offer.noOfRequest!.toString(),
-                                style: const TextStyle(color: Colors.white),
-                              ),
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          elevation: 3,
+                          child: ListTile(
+                            onTap: () async {
+                              await controller.getDetailRider(offer.id!);
+                              // Get.to(() => ShowDeliveryBoyDetail());
+                            },
+                            // trailing: CircleAvatar(
+                            //   radius: size.height * 0.015,
+                            //   backgroundColor: redColor,
+                            //   child: Center(
+                            //     child: Text(
+                            //       offer.noOfRequest!.toString(),
+                            //       style: const TextStyle(color: Colors.white),
+                            //     ),
+                            //   ),
+                            // ),
+                            title: Text(offer.title!.capitalizeFirst!),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(offer.description!),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                        child: SizedBox(
+                                      height: 40,
+                                      child: PrimaryButton(
+                                          grediantColor: const [
+                                            Colors.green,
+                                            Colors.green
+                                          ],
+                                          text: 'Accept',
+                                          onPressed: () async {
+                                            await controller
+                                                .getDetailRider(offer.id!);
+
+                                            await requestController
+                                                .onTheWayRequest(
+                                                    offer.id!,
+                                                    requestController
+                                                        .getRequest![index]
+                                                        .delivery_boy_id!);
+                                            print(
+                                                'offer id is:${requestController.getRequest![index].id!}');
+                                            // Get.put(PushNotificationsController())
+                                            //     .sendPushMessage(
+                                            //         // requestController.token.value,
+                                            //         'cgpiBvqjR6yhwUOEUUpMNf:APA91bECJnhPaTWUDg9md7MFNlSXyqwS8AU-FWEQg89dUTReLS3sUpRBP54VunW7HbxaOVeQbVuzXd61Ztypm04Hsxyj0S0A-Rf2iC5EIlLTe7qRxlMqIcRNhkYCVqqyRCRyQZexg1wx',
+                                            //         requestController
+                                            //             .getRequest![index]
+                                            //             .email!,
+                                            //         requestController
+                                            //             .getRequest![index]
+                                            //             .email!);
+                                          }),
+                                    )),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Flexible(
+                                        child: SizedBox(
+                                      height: 40,
+                                      child: PrimaryButton(
+                                          text: 'Cancel',
+                                          onPressed: () async {
+                                            await controller
+                                                .getDetailRider(offer.id!);
+                                            await requestController
+                                                .cancelRequest(
+                                                    offer.id!,
+                                                    controller
+                                                        .getRequest![index]
+                                                        .delivery_boy_id!);
+                                            print("Document id:${offer.id}");
+                                            print(
+                                                "Delivery id:${requestController.getRequest![index].delivery_boy_id!}");
+                                          }),
+                                    )),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                              ],
+                            ),
+                            leading: CircleAvatar(
+                              backgroundImage: offer.request_image!.isNotEmpty
+                                  ? NetworkImage(offer.request_image!)
+                                  : const NetworkImage(
+                                      'https://img.freepik.com/free-vector/way-concept-illustration_114360-1191.jpg?w=2000&t=st=1665469064~exp=1665469664~hmac=f18cfd14cfdc7389b9238600501c87cd28798d2e6fbb6058d4b699309ebce3b9',
+                                    ),
                             ),
                           ),
-                          title: Text(offer.title!.capitalizeFirst!),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(offer.description!),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                      child: SizedBox(
-                                    height: 40,
-                                    child: PrimaryButton(
-                                        grediantColor: const [
-                                          Colors.green,
-                                          Colors.green
-                                        ],
-                                        text: 'Accept',
-                                        onPressed: () async {
-                                          await controller
-                                              .getDetailRider(offer.id!);
-
-                                          await requestController
-                                              .onTheWayRequest(
-                                                  offer.id!,
-                                                  requestController
-                                                      .getRequest![index]
-                                                      .delivery_boy_id!);
-                                          print(
-                                              "request token ${requestController.token.value}");
-                                          Get.put(PushNotificationsController())
-                                              .sendPushMessage(
-                                                  // requestController.token.value,
-                                                  'cgpiBvqjR6yhwUOEUUpMNf:APA91bECJnhPaTWUDg9md7MFNlSXyqwS8AU-FWEQg89dUTReLS3sUpRBP54VunW7HbxaOVeQbVuzXd61Ztypm04Hsxyj0S0A-Rf2iC5EIlLTe7qRxlMqIcRNhkYCVqqyRCRyQZexg1wx',
-                                                  requestController
-                                                      .getRequest![index]
-                                                      .email!,
-                                                  requestController
-                                                      .getRequest![index]
-                                                      .email!);
-                                          // await requestController
-                                          //     .sendNotification(
-                                          //         '',
-                                          //         requestController
-                                          //             .getRequest![index].name,
-                                          //         offer.title);
-                                        }),
-                                  )),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Flexible(
-                                      child: SizedBox(
-                                    height: 40,
-                                    child: PrimaryButton(
-                                        text: 'Cancel',
-                                        onPressed: () async {
-                                          await controller
-                                              .getDetailRider(offer.id!);
-                                          await requestController.cancelRequest(
-                                              offer.id!,
-                                              requestController
-                                                  .getRequest![index]
-                                                  .delivery_boy_id!);
-                                          print("Document id:${offer.id}");
-                                          print(
-                                              "Delivery id:${requestController.getRequest![index].delivery_boy_id!}");
-                                        }),
-                                  )),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                          leading: CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(offer.request_image!)),
                         ),
                       );
                     });

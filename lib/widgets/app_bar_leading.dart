@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-
-import '../utils/constants.dart';
+import 'package:get/get.dart';
 
 class AppbarLeading extends StatelessWidget {
   const AppbarLeading({
@@ -17,26 +14,12 @@ class AppbarLeading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: InkWell(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Container(
-          height: 30,
-          width: 30,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(borderRadius),
-            border:
-                isBorder ? Border.all(color: const Color(0xffB0D8FF)) : null,
-          ),
-          child: Icon(
-            Platform.isAndroid ? Icons.arrow_back : Icons.arrow_back_ios_new,
-            size: 15,
-            color: blackColor,
-          ),
-        ),
-      ),
-    );
+        child: IconButton(
+            onPressed: () => Get.back(),
+            icon: Image.asset(
+              "assets/icons/left-arrow.png",
+              height: Get.height * 0.03,
+              color: Colors.white,
+            )));
   }
 }

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodbari_deliver_app/Models/all_request_model.dart';
+import 'package:foodbari_deliver_app/Models/distance_model.dart';
 import 'package:foodbari_deliver_app/Models/place_autocomplete_response.dart';
 import 'package:foodbari_deliver_app/Models/rating_model.dart';
 import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
@@ -30,10 +33,36 @@ class RequestController extends GetxController {
 
   Rxn<List<GetRequestModel>> getRequestModel = Rxn<List<GetRequestModel>>();
   List<GetRequestModel>? get getRequest => getRequestModel.value;
+  Rxn<Distancemodels> distanceModel = Rxn<Distancemodels>();
   final firstore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
   CustomerController userController = Get.put(CustomerController());
   RxString token = ''.obs;
+
+/////// getting distance from latlng
+
+  var distances;
+  var traveltime;
+
+  distance({pickLat, pickLng, dropLat, dropLng}) async {
+    var request = http.Request(
+        'GET',
+        Uri.parse(
+            'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${pickLat},${pickLng}&destinations=${dropLat},${dropLng}&key=AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0'));
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      distances = await response.stream.bytesToString();
+      Map<String, dynamic> map = jsonDecode(distances);
+      //print("map is here : ${map}");
+
+      distanceModel.value = Distancemodels.fromJson(map);
+    } else {
+      print(response.reasonPhrase);
+    }
+  }
+
   Future<void> submitRequest({
     context,
     pickAddress,
@@ -84,7 +113,7 @@ class RequestController extends GetxController {
       };
       await _firestore.collection('all_requests').add(requestData);
       Get.back();
-      Get.to(() => RequestSentSuccessPage());
+      Get.to(() => const RequestSentSuccessPage());
       // Utils.showCustomDialog(context,
       //     child: Padding(
       //       padding: const EdgeInsets.all(12.0),
@@ -127,7 +156,6 @@ class RequestController extends GetxController {
   }
 
   Stream<List<AllRequestModel>> receiveOfferStream() {
-    print("receive offer stream funtion ${customerController.user!.uid}");
     return _firestore
         .collection('all_requests')
         .where("customer_id", isEqualTo: customerController.user!.uid)
@@ -138,9 +166,9 @@ class RequestController extends GetxController {
 
       for (var element in query.docs) {
         retVal.add(AllRequestModel.fromSnapshot(element));
+        // print('print${element['address']}');
       }
 
-      debugPrint('offer   lenght is ${retVal.length}');
       return retVal;
     });
   }
@@ -162,9 +190,9 @@ class RequestController extends GetxController {
 
       for (var element in query.docs) {
         retVal.add(GetRequestModel.fromSnapshot(element));
+        print('offer1${element['address']}');
       }
 
-      debugPrint('offer   lenght is ${retVal.length}');
       return retVal;
     });
   }
@@ -201,10 +229,14 @@ class RequestController extends GetxController {
   }
 
   Future<void> onTheWayRequest(String id, String deliveryBoyId) async {
-    await firstore.collection("all_requests").doc(id).update({
-      "status": "On the way",
-      "delivery_boy_id": deliveryBoyId,
-    });
+    try {
+      await firstore.collection("all_requests").doc(id).update({
+        "status": "On the way",
+        "delivery_boy_id": deliveryBoyId,
+      });
+    } catch (e) {
+      print("error getting is:" + e.toString());
+    }
   }
 
   // sendNotification(
@@ -237,6 +269,12 @@ class RequestController extends GetxController {
         .collection("all_requests")
         .doc(id)
         .update({"isComplete": false, "status": "Completed"});
+  }
+
+  Future<void> cancelOffer(String id) async {
+    await firstore.collection("all_requests").doc(id).update({
+      "isComplete": false,
+    });
   }
 
   Future<void> giveRatingToRider(

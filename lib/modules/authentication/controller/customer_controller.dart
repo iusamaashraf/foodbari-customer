@@ -79,8 +79,8 @@ class CustomerController extends GetxController {
   // <<<<<<<<===============login account function =================>>>>>>>>
 
   void login(String email, String password, context) async {
-    Utils.showLoadingDialog(context, text: "Login...");
     try {
+      Utils.showLoadingDialog(context, text: "Login...");
       await auth
           .signInWithEmailAndPassword(
               email: email.trim(), password: password.trim())

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/k_images.dart';
 import '../../../widgets/custom_image.dart';
@@ -33,16 +34,14 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           child: Center(
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 60),
-                  const CustomImage(
-                    path: Kimages.logoIcon,
-                    color: redColor,
-                    width: 250,
-                    height: 48,
+                  Padding(
+                    padding:  EdgeInsets.only(left: Get.width*0.04),
+                    child: Image.asset("assets/icons/delivery-boy.png",height: Get.height*0.1,),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 5),
                   _buildHeader(),
                   const SizedBox(height: 13),
                   _buildTabText(),
