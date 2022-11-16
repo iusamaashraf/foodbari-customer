@@ -78,15 +78,15 @@ class _SigninFormState extends State<SigninForm> {
               // Get.offAll(() => MainPage());
             },
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Sign In With Social',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          const SocialButtons(),
-          const SizedBox(height: 25),
-          const GuestButton(),
+          // const SizedBox(height: 16),
+          // const Text(
+          //   'Sign In With Social',
+          //   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          // ),
+          // const SizedBox(height: 12),
+          // // const SocialButtons(),
+          // const SizedBox(height: 25),
+          // const GuestButton(),
         ],
       ),
     );

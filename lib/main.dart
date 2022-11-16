@@ -5,6 +5,7 @@ import 'package:foodbari_deliver_app/modules/authentication/controller/customer_
 import 'package:get/get.dart';
 // import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart' as fcm;
+import 'map_picker/pick_location_screen.dart';
 import 'router_name.dart';
 import 'utils/k_strings.dart';
 import 'utils/my_theme.dart';

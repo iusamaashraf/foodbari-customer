@@ -75,7 +75,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       alignment: Alignment.topLeft,
       duration: kDuration,
       child: Text(
-        _currentPage == 0 ? 'Welcome back!' : 'Create Aceount',
+        _currentPage == 0 ? 'Welcome back!' : 'Create Account',
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
       ),
     );

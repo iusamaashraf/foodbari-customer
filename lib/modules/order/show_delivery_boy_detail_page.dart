@@ -33,7 +33,7 @@ class ShowDeliveryBoyDetail extends StatelessWidget {
                 : ListView.builder(
                     shrinkWrap: true,
                     // physics: const NeverScrollableScrollPhysics(),
-                    itemCount: requestController.getRequest!.length,
+                    itemCount: requestController.getRequest.length,
                     itemBuilder: (context, index) {
                       return Container(
                         padding: const EdgeInsets.all(12),
@@ -98,22 +98,53 @@ class ShowDeliveryBoyDetail extends StatelessWidget {
                                         color: Colors.black,
                                         fontWeight: FontWeight.normal)),
                             Text(
-                                'Far Away:${double.parse(
-                                  calculateDistance(
-                                          requestController.getRequest![index]
-                                              .location!.latitude,
-                                          requestController.getRequest![index]
-                                              .location!.longitude,
-                                          customerController.customerLat.value,
-                                          customerController.customerLong.value)
-                                      .toString(),
-                                ).toStringAsFixed(2)} Km ',
+                                'Offer Description: ' +
+                                    requestController
+                                        .getRequest![index].offerDiscription!,
                                 style: Theme.of(context)
                                     .textTheme
                                     .caption!
                                     .copyWith(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    'Far Away:${double.parse(
+                                      calculateDistance(
+                                              requestController
+                                                  .getRequest![index]
+                                                  .location!
+                                                  .latitude,
+                                              requestController
+                                                  .getRequest![index]
+                                                  .location!
+                                                  .longitude,
+                                              customerController
+                                                  .customerLat.value,
+                                              customerController
+                                                  .customerLong.value)
+                                          .toString(),
+                                    ).toStringAsFixed(2)} Km ',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold)),
+                                Text(
+                                    'Offer Price: \$ ' +
+                                        requestController
+                                            .getRequest[index].offerPrice!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold)),
+                              ],
+                            ),
                             const SizedBox(
                               height: 5,
                             ),

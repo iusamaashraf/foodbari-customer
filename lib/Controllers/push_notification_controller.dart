@@ -1,11 +1,43 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
+import '../modules/notification/model/notification_model.dart';
+import '../modules/notification/model/notifications_model.dart';
+
 class PushNotificationsController extends GetxController {
+  Rxn<List<NotificationsModel>> notificationList =
+      Rxn<List<NotificationsModel>>();
+  List<NotificationsModel>? get notification => notificationList.value;
+  @override
+  void onInit() {
+    notificationList.bindStream(allNotificationStream());
+    super.onInit();
+  }
+
+  Stream<List<NotificationsModel>> allNotificationStream() {
+    print("enter in all notification stream funtion");
+    return FirebaseFirestore.instance
+        .collection('Customer')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Notifications")
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<NotificationsModel> retVal = [];
+
+      for (var element in query.docs) {
+        retVal.add(NotificationsModel.fromSnapshot(element));
+      }
+
+      print('Notification lenght is ${retVal.length}');
+      return retVal;
+    });
+  }
+
   void sendPushMessage(String token, String body, String title) async {
     try {
       //POST METHOD FOR PUSH NOTIFICATIONS (FIREBASE CLOUD MESSAGING)
@@ -16,7 +48,7 @@ class PushNotificationsController extends GetxController {
         headers: <String, String>{
           'Content-Type': 'application/json',
           'Authorization':
-              'key=AAAAxAa4P1A:APA91bGsA7nwv-KBW1QUtC9ECeC5x0bfiKLZH2_cBWfOz7XcdYTSo2qDNHJKhUAsMTVIIuWttCnrv4JC3MaGJfk40MqzTaqSOAY8LHPOWYyn1oZ-xYod_yfzlhrguTFO6jqBcvNjjPqO',
+              'key=AAAA9PDTLnc:APA91bEbTiZ-dinqwCDgM_ev2SxFtbfPN8fn2E2nnuo1V7WspMj39Dwf8chbQDJ4Ngx-XaFWOhjTFm-Z22Zqg_zwA8KAZCwWdC9UZeC7P_OhGe-32GlJYkVrCjP17xpzVjVSMeo3mZeN',
         },
         //IT IS GIVING THE NOTIFICATION THE BODY AND TITLE
         body: jsonEncode(
@@ -24,7 +56,6 @@ class PushNotificationsController extends GetxController {
             'notification': <String, dynamic>{
               'body': body,
               'title': title,
-              "sound": "notification.mp3"
             },
             'priority': 'high',
             'data': <String, dynamic>{

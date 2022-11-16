@@ -12,6 +12,8 @@ class GetRequestModel {
   // ignore: non_constant_identifier_names
   String? offer_id;
   String? phone;
+  String? offerDiscription;
+  String? offerPrice;
 
   GetRequestModel({
     this.id,
@@ -25,6 +27,8 @@ class GetRequestModel {
     // ignore: non_constant_identifier_names
     this.offer_id,
     this.phone,
+    this.offerDiscription,
+    this.offerPrice,
   });
   GetRequestModel.fromSnapshot(DocumentSnapshot data) {
     print("Delivery boy id is:${data['delivery_boy_id']}");
@@ -37,6 +41,8 @@ class GetRequestModel {
     name = data['name'] ?? '';
     offer_id = data['offer_id'] ?? '';
     phone = data['phone'] ?? '';
-    print("Delivery boy id is:$address");
+    offerDiscription = data['offerDiscription'] ?? '';
+    offerPrice = data['offerPrice'] ?? '';
+    //  print("Delivery boy id is:$address");
   }
 }

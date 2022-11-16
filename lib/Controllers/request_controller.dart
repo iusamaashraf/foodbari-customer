@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:foodbari_deliver_app/Controllers/push_notification_controller.dart';
+import 'package:foodbari_deliver_app/modules/notification/model/notifications_model.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,18 +24,26 @@ import 'package:get/get.dart';
 import 'package:google_geocoding/google_geocoding.dart';
 import 'package:http/http.dart';
 
+import '../modules/notification/model/notification_model.dart';
+
 class RequestController extends GetxController {
   File? requestImage;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  TextEditingController pickLocationController = TextEditingController();
+  TextEditingController dropLocationController = TextEditingController();
+  double lat = 0.0;
+  double lng = 0.0;
+  LatLng? pickLatLng;
+  LatLng? dropLatLng;
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   CustomerController customerController = Get.put(CustomerController());
 
   Rxn<List<GetRequestModel>> getRequestModel = Rxn<List<GetRequestModel>>();
-  List<GetRequestModel>? get getRequest => getRequestModel.value;
+  List<GetRequestModel> get getRequest => getRequestModel.value!;
   Rxn<Distancemodels> distanceModel = Rxn<Distancemodels>();
   final firstore = FirebaseFirestore.instance;
   final auth = FirebaseAuth.instance;
@@ -55,7 +66,7 @@ class RequestController extends GetxController {
     if (response.statusCode == 200) {
       distances = await response.stream.bytesToString();
       Map<String, dynamic> map = jsonDecode(distances);
-      //print("map is here : ${map}");
+      print("map is here : ${map}");
 
       distanceModel.value = Distancemodels.fromJson(map);
     } else {
@@ -86,6 +97,7 @@ class RequestController extends GetxController {
         url = await ref.getDownloadURL();
       }
       Map<String, dynamic> requestData = {
+        'all_rider': [],
         'request_image': requestImage == null ? '' : url,
         'title': titleController.text,
         'description': descriptionController.text,
@@ -110,8 +122,36 @@ class RequestController extends GetxController {
         "drop_location": dropLocation,
         "distance": distance,
         "delivery_fee": deliveryFee,
+        "get_the_package": false,
       };
-      await _firestore.collection('all_requests').add(requestData);
+      await _firestore
+          .collection('all_requests')
+          .add(requestData)
+          .then((val) async {
+        //SEND PUSH NOTIFICATION
+        await FirebaseFirestore.instance
+            .collection("DeliveryBoyTokens")
+            .get()
+            .then((value) async {
+          for (int i = 0; i < value.docs.length; i++) {
+            Get.find<PushNotificationsController>().sendPushMessage(
+                value.docs[i].get("Token"),
+                "You recieved a request. Go and checkout",
+                "New Request");
+            await FirebaseFirestore.instance
+                .collection("delivery_boy")
+                .doc(value.docs[i].id)
+                .collection("Notifications")
+                .add({
+              "Title": "New Request",
+              "Seen": false,
+              "Body":
+                  "You recieved a request from ${Get.find<CustomerController>().customerModel.value!.name}. Go and checkout",
+              "Date": DateTime.now().toString()
+            });
+          }
+        });
+      });
       Get.back();
       Get.to(() => const RequestSentSuccessPage());
       // Utils.showCustomDialog(context,
@@ -150,6 +190,8 @@ class RequestController extends GetxController {
   @override
   void onInit() {
     offerList.bindStream(receiveOfferStream());
+    notificationList.bindStream(allNotificationStream());
+    allRequestList.bindStream(allRequestStrem());
 
     //print("active length is:${active!.length}");
     super.onInit();
@@ -174,12 +216,24 @@ class RequestController extends GetxController {
   }
 
 // <================== Request that we get from rider after sent request ===========================>
-  Future<void> getDetailRider(String id) async {
+  Future<void> getOffersDetails(String id) async {
     getRequestModel.bindStream(receiveOfferDetailStream(id));
   }
 
+  // Rx<GetRequestModel> requestModel = Rx(GetRequestModel());
+
+  // Future<void> getRiderFunction(String id) async {
+  //   var data = await _firestore
+  //       .collection('all_requests')
+  //       .doc(id)
+  //       .collection('received_offer')
+  //       .get();
+  //   requestModel.value = GetRequestModel.fromSnapshot(data.docs[0]);
+  //   update();
+  // }
+
   Stream<List<GetRequestModel>> receiveOfferDetailStream(String id) {
-    print("receive offer stream funtion ${customerController.user!.uid}");
+    print("receive offer stream funtion $id");
     return _firestore
         .collection('all_requests')
         .doc(id)
@@ -190,26 +244,26 @@ class RequestController extends GetxController {
 
       for (var element in query.docs) {
         retVal.add(GetRequestModel.fromSnapshot(element));
-        print('offer1${element['address']}');
+        // print('offer1${element['address']}');
       }
-
+      print("recec offer lenght : ${retVal.length}");
       return retVal;
     });
   }
 
   Rxn<List<AllRequestModel>> orderStatusList = Rxn<List<AllRequestModel>>();
   List<AllRequestModel>? get orderStatus => orderStatusList.value;
-  void getOrderStatus(String status) {
-    orderStatusList.bindStream(orderStatusScreen(status));
+  void getOrderStatus() {
+    orderStatusList.bindStream(orderStatusScreen());
     super.onInit();
   }
 
-  Stream<List<AllRequestModel>> orderStatusScreen(String status) {
+  Stream<List<AllRequestModel>> orderStatusScreen() {
     return FirebaseFirestore.instance
         .collection('all_requests')
         .where("customer_id",
             isEqualTo: Get.find<CustomerController>().user!.uid)
-        .where("status", isEqualTo: status)
+        // .where("status", isEqualTo: status)
         .snapshots()
         .map((QuerySnapshot query) {
       List<AllRequestModel> retVal = [];
@@ -221,18 +275,80 @@ class RequestController extends GetxController {
     });
   }
 
+  // Future<void> cancelRequest(String id, String deliveryBoyId) async {
+  //   await firstore.collection("all_requests").doc(id).update({
+  //     "status": "Cancelled",
+  //     "delivery_boy_id": deliveryBoyId,
+  //   });
+  // }
+
   Future<void> cancelRequest(String id, String deliveryBoyId) async {
     await firstore.collection("all_requests").doc(id).update({
       "status": "Cancelled",
       "delivery_boy_id": deliveryBoyId,
+    }).then((val) async {
+      await FirebaseFirestore.instance
+          .collection("DeliveryBoyTokens")
+          .doc(deliveryBoyId)
+          .get()
+          .then((value) {
+        Get.find<PushNotificationsController>().sendPushMessage(
+          value.get("Token"),
+          "Your request for an offer is cancelled",
+          "Request Cancelled",
+        );
+      });
+      await FirebaseFirestore.instance
+          .collection("delivery_boy")
+          .doc(deliveryBoyId)
+          .collection("Notifications")
+          .add({
+        "Title": "Request Cancelled",
+        "Body": "Your request for an offer is cancelled",
+        "Date": DateTime.now().toString(),
+        "Seen": false,
+      });
     });
   }
+
+  // Future<void> onTheWayRequest(String id, String deliveryBoyId) async {
+  //   try {
+  //     await firstore.collection("all_requests").doc(id).update({
+  //       "status": "On the way",
+  //       "delivery_boy_id": deliveryBoyId,
+  //     });
+  //   } catch (e) {
+  //     print("error getting is:" + e.toString());
+  //   }
+  // }
 
   Future<void> onTheWayRequest(String id, String deliveryBoyId) async {
     try {
       await firstore.collection("all_requests").doc(id).update({
         "status": "On the way",
         "delivery_boy_id": deliveryBoyId,
+      }).then((val) async {
+        await FirebaseFirestore.instance
+            .collection("DeliveryBoyTokens")
+            .doc(deliveryBoyId)
+            .get()
+            .then((value) {
+          Get.find<PushNotificationsController>().sendPushMessage(
+              value.get("Token"),
+              "Your request for an offer is accepted go and grab the packet",
+              "Request Accepted");
+        });
+        await FirebaseFirestore.instance
+            .collection("delivery_boy")
+            .doc(deliveryBoyId)
+            .collection("Notifications")
+            .add({
+          "Title": "Request Accepted",
+          "Body":
+              "Your request for an offer is accepted go and grab the packet",
+          "Date": DateTime.now().toString(),
+          "Seen": false,
+        });
       });
     } catch (e) {
       print("error getting is:" + e.toString());
@@ -262,6 +378,7 @@ class RequestController extends GetxController {
   Future<void> getRiderDetails(String id) async {
     var doc = await firstore.collection("delivery_boy").doc(id).get();
     customerModel.value = RiderDataModel.fromSnapshot(doc);
+    print("her es email ${customerModel.value!.rider_email}");
   }
 
   Future<void> completeDelivery(String id) async {
@@ -277,13 +394,19 @@ class RequestController extends GetxController {
     });
   }
 
-  Future<void> giveRatingToRider(
-      String riderId, double stars, String reviews, String customerId) async {
+  Future<void> giveRatingToRider(String riderId, double stars, String reviews,
+      String customerId, String customerName, String customerImage) async {
     await firstore
         .collection("delivery_boy")
         .doc(riderId)
         .collection("ratting")
-        .add({"stars": stars, "reviews": reviews, "customerId": customerId});
+        .add({
+      "stars": stars,
+      "reviews": reviews,
+      "customerId": customerId,
+      "customer_image": customerImage,
+      "customer_name": customerName
+    });
   }
 
   Rxn<List<RatingModel>> ratingList = Rxn<List<RatingModel>>();
@@ -431,6 +554,48 @@ class RequestController extends GetxController {
         retVal.add(AllRequestModel.fromSnapshot(element));
       }
       print("sending length is${retVal.length.toString()}");
+      return retVal;
+    });
+  }
+
+  Rxn<List<AllRequestModel>> allRequestList = Rxn<List<AllRequestModel>>();
+  List<AllRequestModel>? get allRequests => allRequestList.value;
+  Stream<List<AllRequestModel>> allRequestStrem() {
+    return FirebaseFirestore.instance
+        .collection('all_requests')
+        .where("customer_id",
+            isEqualTo: Get.find<CustomerController>().user!.uid)
+        //  .where("status", isEqualTo: '')
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<AllRequestModel> retVal = [];
+      for (var element in query.docs) {
+        retVal.add(AllRequestModel.fromSnapshot(element));
+      }
+      print("all request length is${retVal.length.toString()}");
+      return retVal;
+    });
+  }
+
+  Rxn<List<NotificationsModel>> notificationList =
+      Rxn<List<NotificationsModel>>();
+  List<NotificationsModel>? get notification => notificationList.value ?? [];
+
+  Stream<List<NotificationsModel>> allNotificationStream() {
+    print("enter in all product stream funtion");
+    return FirebaseFirestore.instance
+        .collection('delivery_boy')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection("Notifications")
+        .snapshots()
+        .map((QuerySnapshot query) {
+      List<NotificationsModel> retVal = [];
+
+      for (var element in query.docs) {
+        retVal.add(NotificationsModel.fromSnapshot(element));
+      }
+
+      print('Notification lenght is ${retVal.length}');
       return retVal;
     });
   }

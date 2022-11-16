@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:foodbari_deliver_app/Controllers/request_controller.dart';
 import 'package:foodbari_deliver_app/Models/all_request_model.dart';
@@ -18,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 import 'package:url_launcher/url_launcher_string.dart';
 import 'dart:ui' as ui;
 
@@ -94,6 +96,11 @@ class _MapScreenState extends State<MapScreen> {
   // bool isLoading = false;
   @override
   void initState() {
+    Timer(Duration(seconds: 2), () async {
+      print("callllllllllllll dictance");
+      await calDistance();
+      setState(() {});
+    });
     getPolyPoints();
     calDistance();
 
@@ -164,7 +171,7 @@ class _MapScreenState extends State<MapScreen> {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          requestController.distanceModel.value != null
+          requestController.distances != null
               ? GoogleMap(
                   initialCameraPosition: CameraPosition(
                     target: LatLng(widget.pickLat, widget.pickLng),
@@ -259,19 +266,43 @@ class _MapScreenState extends State<MapScreen> {
                                       fontWeight: FontWeight.normal,
                                     ),
                               ),
-                              Obx(
-                                () => Text(
-                                  requestController.distanceModel.value!
-                                      .rows![0].elements![0].duration!.text!,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle1!
-                                      .copyWith(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              )
+                              //  Text(
+                              //           requestController
+                              //               .distanceModel
+                              //               .value!
+                              //               .rows![0]
+                              //               .elements![0]
+                              //               .duration!
+                              //               .text!,
+                              //           style: Theme.of(context)
+                              //               .textTheme
+                              //               .subtitle1!
+                              //               .copyWith(
+                              //                 color: Colors.black,
+                              //                 fontWeight: FontWeight.bold,
+                              //               )),
+                              Obx(() {
+                                return requestController.distanceModel.value !=
+                                        null
+                                    ? Text(
+                                        requestController
+                                            .distanceModel
+                                            .value!
+                                            .rows![0]
+                                            .elements![0]
+                                            .duration!
+                                            .text!,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .subtitle1!
+                                            .copyWith(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ))
+                                    : Container(
+                                        child: Text('Loading'),
+                                      );
+                              })
                             ],
                           ),
                         ],
@@ -336,9 +367,20 @@ class _MapScreenState extends State<MapScreen> {
                                 ),
                                 const Spacer(),
                                 GestureDetector(
-                                  onTap: () {
-                                    launchUrlString(
-                                        'sms:+92 30012345678?body= Hi Welcome to foodbari customer');
+                                  onTap: () async {
+                                    String _sms =
+                                        'sms:0030012345678&body= Hi Welcome to foodbari customer';
+
+                                    if (await UrlLauncher.canLaunchUrl(
+                                        Uri.parse(_sms))) {
+                                      print("entered");
+                                      await UrlLauncher.launchUrl(
+                                          Uri.parse(_sms));
+                                    }
+
+                                    print("Presseeeeeeeeeeeeed");
+                                    // launchUrlString(
+                                    //     'sms:+92 30012345678?body= Hi Welcome to foodbari customer');
                                   },
                                   child: Container(
                                     height: size.height * 0.05,
@@ -358,9 +400,10 @@ class _MapScreenState extends State<MapScreen> {
                                   width: 10,
                                 ),
                                 GestureDetector(
-                                  onTap: () async {
-                                    launchUrlString('tel:+92 30012345678');
-                                  },
+                                  onTap: _callNumber,
+                                  // onTap: () async {
+                                  //   launchUrlString('tel:+92 30012345678');
+                                  // },
                                   child: Container(
                                     height: size.height * 0.05,
                                     width: size.width * 0.1,
@@ -452,6 +495,7 @@ class _MapScreenState extends State<MapScreen> {
               ],
             ),
           ),
+          // here is the time
           Positioned(
             top: size.height * 0.15,
             child: Container(
@@ -461,17 +505,32 @@ class _MapScreenState extends State<MapScreen> {
               decoration: BoxDecoration(
                   color: redColor, borderRadius: BorderRadius.circular(100)),
               child: Center(
-                child: Obx(() => Text(
-                      requestController.distanceModel.value!.rows![0]
-                          .elements![0].distance!.text!,
-                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    )),
+                child: Obx(() {
+                  return requestController.distanceModel.value != null
+                      ? Text(
+                          requestController.distanceModel.value!.rows![0]
+                              .elements![0].distance!.text!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .subtitle1!
+                              .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                        )
+                      : Container(
+                          child: Text('Loading'),
+                        );
+                }),
               ),
             ),
           )
         ],
       ),
     ));
+  }
+
+  _callNumber() async {
+    const number = '08592119XXXX'; //set the number here
+    var res = await FlutterPhoneDirectCaller.callNumber(number);
   }
 }

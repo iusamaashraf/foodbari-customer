@@ -78,7 +78,7 @@ class ProfielEditForm extends StatelessWidget {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       controller.updateProfile(
-                          // image: controller.customerModel.value!.profileImage!,
+                          image: controller.customerModel.value!.profileImage!,
                           name: nameController.text,
                           phone: phoneController.text,
                           context: context);

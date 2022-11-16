@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:foodbari_deliver_app/Controllers/push_notification_controller.dart';
 import 'package:foodbari_deliver_app/Controllers/request_controller.dart';
 import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
 import 'package:foodbari_deliver_app/modules/order/home_screen.dart';
+import 'package:foodbari_deliver_app/modules/order/new_request.dart';
 import 'package:foodbari_deliver_app/modules/order/order_details_page.dart';
 import 'package:get/get.dart';
 import 'package:firebase_messaging/firebase_messaging.dart' as fcm;
@@ -29,24 +31,26 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-
+    Get.put(PushNotificationsController());
     generatingTokenForUser();
-    getTokenId();
+
+    // getTokenId();
     customerController.getProfileData();
     customerController.getCurrentLocation().then((value) async {
       await customerController.updateLocation();
     });
     Get.put(CustomerController()).getProfileData();
-
+    unseenNotificationsQuery();
     pageList = [
       const HomeScreen(),
       // const ChatListScreen(),
-      OrderDetailsPage(),
+      NewRequestScreen(),
+      // OrderDetailsPage(),
       ProfileScreen(),
     ];
   }
 
-  fcm.FirebaseMessaging _fcm = fcm.FirebaseMessaging.instance;
+  final fcm.FirebaseMessaging _fcm = fcm.FirebaseMessaging.instance;
 
   generatingTokenForUser() async {
     //GENERATING A TOKEN FROM FIREBASE MESSAGING
@@ -54,7 +58,7 @@ class _MainPageState extends State<MainPage> {
     //GETTING CURRENTUSER ID
     final uid = Get.find<CustomerController>().user?.uid ?? "Null";
     print("This is the user $uid");
-    await FirebaseFirestore.instance.collection("UserTokens").doc(uid).set({
+    await FirebaseFirestore.instance.collection("CustomerTokens").doc(uid).set({
       "CreatedAt": FieldValue.serverTimestamp(),
       "Token": fcmToken,
       "UID": uid
@@ -63,16 +67,30 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
-  Future<void> getTokenId() async {
+  unseenNotificationsQuery() async {
     await FirebaseFirestore.instance
-        .collection("UserTokens")
+        .collection("Customer")
         .doc(Get.find<CustomerController>().user?.uid)
+        .collection("Notifications")
+        .where("Seen", isEqualTo: false)
         .get()
-        .then((value) async {
-      requestController.token.value = await value.data()!['Token'];
-      print("token is here  : ${requestController.token.value}");
+        .then((value) {
+      for (int i = 0; i < value.docs.length; i++) {
+        Get.find<CustomerController>().notifyCounter =
+            Get.find<CustomerController>().notifyCounter + 1;
+      }
     });
   }
+  // Future<void> getTokenId() async {
+  //   await FirebaseFirestore.instance
+  //       .collection("UserTokens")
+  //       .doc(Get.find<CustomerController>().user?.uid)
+  //       .get()
+  //       .then((value) async {
+  //     requestController.token.value = await value.data()!['Token'];
+  //     print("token is here  : ${requestController.token.value}");
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

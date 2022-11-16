@@ -23,6 +23,8 @@ class AllRequestModel {
   GeoPoint? dropLocation;
   double? distance;
   double? deliveryfee;
+  bool? getThePackage;
+  List<dynamic>? all_rider;
   AllRequestModel({
     this.isCompleted,
     this.noOfRequest,
@@ -46,6 +48,8 @@ class AllRequestModel {
     this.dropLocation,
     this.distance,
     this.deliveryfee,
+    this.getThePackage,
+    this.all_rider,
   });
   AllRequestModel.fromSnapshot(DocumentSnapshot data) {
     id = data.id;
@@ -69,6 +73,8 @@ class AllRequestModel {
     dropLocation = data['drop_location'] ?? const GeoPoint(0.0, 0.0);
     distance = data['distance'] ?? 0.0;
     deliveryfee = data['delivery_fee'] ?? 0.0;
+    getThePackage = data["get_the_package"] ?? false;
+    all_rider = data['all_rider'] ?? [];
     //  / tokenId = data['tokenId'] ?? '';
   }
 }

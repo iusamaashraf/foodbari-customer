@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:foodbari_deliver_app/Controllers/request_controller.dart';
 import 'package:foodbari_deliver_app/Models/autocomplete_prediction.dart';
+import 'package:foodbari_deliver_app/map_picker/pick_location_screen.dart';
+import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
 import 'package:foodbari_deliver_app/utils/constants.dart';
 import 'package:foodbari_deliver_app/widgets/location_list_tile.dart';
 import 'package:foodbari_deliver_app/widgets/network_utility.dart';
@@ -16,6 +18,7 @@ import 'package:foodbari_deliver_app/widgets/primary_button.dart';
 import 'package:foodbari_deliver_app/widgets/rounded_app_bar.dart';
 import 'package:get/get.dart';
 import 'package:google_geocoding/google_geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -159,232 +162,244 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: RoundedAppBar(titleText: 'New Request', isLeading: true),
-      body: SizedBox(
-        height: size.height,
-        child: SingleChildScrollView(
-            child: Form(
-                key: key,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: size.height * 0.01,
+      appBar: RoundedAppBar(titleText: 'New Request', isLeading: false),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: size.height,
+          // width: size.width,
+          child: Form(
+              key: key,
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: size.height * 0.01,
+                      ),
+                      TextFormField(
+                        controller: requestController.titleController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Enter Title';
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'Please Enter Title',
                         ),
-                        TextFormField(
-                          controller: requestController.titleController,
+                      ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      TextFormField(
+                          maxLines: 5,
+                          controller: requestController.descriptionController,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Enter Title';
+                              return 'Please Enter Discription';
                             }
                             return null;
                           },
                           decoration: const InputDecoration(
-                            hintText: 'Please Enter Title',
-                          ),
+                              hintText: 'Enter Discription...')),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        controller: requestController.priceController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please Enter Price';
+                          } else if (!GetUtils.isNum(value)) {
+                            return "Invalid Price";
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: 'Enter Price (i.e 200.50)',
                         ),
-                        SizedBox(
-                          height: size.height * 0.02,
+                      ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      TextFormField(
+                        onTap: () {
+                          Get.to(() => PickLocationScreen(
+                                    pickLatlong: LatLng(
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .latitude!,
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .longitude!),
+                                    dropLatlong: LatLng(
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .latitude!,
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .longitude!),
+                                    isPick: true,
+                                  ))!
+                              .then((value) {
+                            setState(() {});
+                          });
+                        },
+                        controller: requestController.pickLocationController,
+                        readOnly: true,
+                        textInputAction: TextInputAction.search,
+                        decoration: InputDecoration(
+                          hintText: requestController
+                                  .pickLocationController.text.isNotEmpty
+                              ? requestController.pickLocationController.text
+                              : "Pick location",
                         ),
-                        TextFormField(
-                            maxLines: 5,
-                            controller: requestController.descriptionController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please Enter Discription';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                                hintText: 'Enter Discription...')),
-                        SizedBox(
-                          height: size.height * 0.02,
+                      ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      TextFormField(
+                        controller: requestController.dropLocationController,
+                        readOnly: true,
+                        onTap: () {
+                          Get.to(() => PickLocationScreen(
+                                    pickLatlong: LatLng(
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .latitude!,
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .longitude!),
+                                    dropLatlong: LatLng(
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .latitude!,
+                                        Get.find<CustomerController>()
+                                            .currentLocation!
+                                            .longitude!),
+                                    isPick: false,
+                                  ))!
+                              .then((value) {
+                            setState(() {});
+                          });
+                        },
+                        textInputAction: TextInputAction.search,
+                        decoration: const InputDecoration(
+                          hintText: "Drop location",
                         ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          controller: requestController.priceController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter Price';
-                            } else if (!GetUtils.isNum(value)) {
-                              return "Invalid Price";
-                            }
-                            return null;
-                          },
-                          decoration: const InputDecoration(
-                            hintText: 'Enter Price (i.e 200.50)',
-                          ),
-                        ),
-                        SizedBox(
-                          height: size.height * 0.02,
-                        ),
-                        TextFormField(
-                          controller: pickController,
-                          onChanged: (value) async {
-                            isPick = true;
-                            ishowPrediction = true;
-                            placeAutoComplete(value);
-                            final geocoding = GoogleMapsGeocoding(
-                                apiKey:
-                                    'AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0');
-                            final response = await geocoding
-                                .searchByPlaceId(placePredictions[0].placeId!);
-                            var result = response.results[0];
-                            pickLat = result.geometry.location.lat;
-                            pickLng = result.geometry.location.lng;
-                          },
-                          textInputAction: TextInputAction.search,
-                          decoration: const InputDecoration(
-                            hintText: "Pick location",
-                          ),
-                        ),
-                        SizedBox(
-                          height: size.height * 0.02,
-                        ),
-                        TextFormField(
-                          controller: dropController,
-                          onChanged: (value) async {
-                            isPick = false;
-                            ishowPrediction = true;
-                            placeAutoComplete(value);
-                            final geocoding = GoogleMapsGeocoding(
-                                apiKey:
-                                    'AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0');
-                            final response = await geocoding
-                                .searchByPlaceId(placePredictions[0].placeId!);
-                            var result = response.results[0];
-                            dropLat = result.geometry.location.lat;
-                            dropLng = result.geometry.location.lng;
-                            // print(
-                            //     "getting latlng: ${result.geometry.location.lat}");
-                            // GoogleGeocoding(
-                            //     'AIzaSyAzr66eCsT-AfdfVw5zoFG0guIHFOeIDr0');
-
-                            // var result =
-                            //     googleGeoCoding.geocoding.get(value, []);
-
-                            // var addresses = await Geocoder.local
-                            //     .findAddressesFromQuery(result);
-                            // print("object: $result");
-                            //  pickLatLong=LatLon(result, longitude);
-                          },
-                          textInputAction: TextInputAction.search,
-                          decoration: const InputDecoration(
-                            hintText: "Drop location",
-                          ),
-                        ),
-                        ishowPrediction
-                            ? SizedBox(
-                                // height: size.height * 0.1,
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: placePredictions.length,
-                                  itemBuilder: (context, index) =>
-                                      LocationListTile(
-                                    press: () {
-                                      if (isPick == true) {
-                                        pickController.text =
-                                            placePredictions[index]
-                                                .description!;
-                                      } else {
-                                        dropController.text =
-                                            placePredictions[index]
-                                                .description!;
-                                      }
-
-                                      ishowPrediction = false;
-                                      setState(() {});
-                                    },
-                                    location:
-                                        placePredictions[index].description!,
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                        SizedBox(
-                          height: size.height * 0.02,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showOptionDialog(context);
-                          },
-                          child: DottedBorder(
-                            borderType: BorderType.RRect,
-                            radius: const Radius.circular(15),
-                            color: redColor,
-                            strokeWidth: 2,
-                            child: SizedBox(
-                              height: size.height * 0.17,
-                              width: size.width - 30,
-                              child: requestController.requestImage != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Image.file(
-                                        requestController.requestImage!,
-                                        fit: BoxFit.fitWidth,
-                                      ),
-                                    )
-                                  : Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Icon(
-                                            CupertinoIcons.add_circled_solid,
-                                            color: redColor,
-                                          ),
-                                          SizedBox(
-                                            width: size.width * 0.02,
-                                          ),
-                                          const Text("Select Image")
-                                        ],
-                                      ),
+                      ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          showOptionDialog(context);
+                        },
+                        child: DottedBorder(
+                          borderType: BorderType.RRect,
+                          radius: const Radius.circular(15),
+                          color: redColor,
+                          strokeWidth: 2,
+                          child: SizedBox(
+                            height: size.height * 0.17,
+                            width: size.width - 30,
+                            child: requestController.requestImage != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.file(
+                                      requestController.requestImage!,
+                                      fit: BoxFit.fitWidth,
                                     ),
-                            ),
+                                  )
+                                : Center(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          CupertinoIcons.add_circled_solid,
+                                          color: redColor,
+                                        ),
+                                        SizedBox(
+                                          width: size.width * 0.02,
+                                        ),
+                                        const Text("Select Image")
+                                      ],
+                                    ),
+                                  ),
                           ),
                         ),
-                        SizedBox(
-                          height: size.height * 0.02,
-                        ),
-                        PrimaryButton(
-                            text: "Submit Request",
-                            onPressed: () {
-                              if (key.currentState!.validate()) {
-                                var totalDistance = calculateDistance(
-                                    pickLat, pickLng, dropLat, dropLng);
-                                double price = 0.0;
-                                if (totalDistance <= 1.0) {
-                                  price = 10.0;
-                                } else if (totalDistance > 1.0 &&
-                                    totalDistance < 5.0) {
-                                  price = 30.0;
-                                } else {
-                                  price = 50.0;
-                                }
-                                requestController.submitRequest(
-                                  context: context,
-                                  pickAddress: pickController.text,
-                                  dropAddress: dropController.text,
-                                  pickLocation: GeoPoint(pickLat, pickLng),
-                                  dropLocation: GeoPoint(dropLat, dropLng),
-                                  distance: totalDistance,
-                                  deliveryFee: price,
-                                );
+                      ),
+                      SizedBox(
+                        height: size.height * 0.02,
+                      ),
+                      PrimaryButton(
+                          text: "Submit Request",
+                          onPressed: () {
+                            print(
+                                "poicklat are:${requestController.pickLatLng?.latitude}");
+                            print(
+                                "picklng is:${requestController.pickLatLng?.longitude}");
+                            print(
+                                'droplat is: ${requestController.dropLatLng?.latitude}');
+                            print(
+                                "droplng is:${requestController.dropLatLng?.longitude}");
+                            if (key.currentState!.validate()) {
+                              var totalDistance = calculateDistance(
+                                requestController.pickLatLng?.latitude,
+                                requestController.pickLatLng?.longitude,
+                                requestController.dropLatLng?.latitude,
+                                requestController.dropLatLng?.longitude,
+                              );
+                              double price = 0.0;
+                              if (totalDistance <= 1.0) {
+                                price = 10.0;
+                              } else if (totalDistance > 1.0 &&
+                                  totalDistance < 5.0) {
+                                price = 30.0;
+                              } else {
+                                price = 50.0;
                               }
-                              // if (requestController.requestImage != null) {
 
-                              // } else {
-                              //   Get.snackbar("Alert",
-                              //       "Please Select image of your product");
-                              // }
-                            })
-                      ],
-                    ),
+                              requestController.submitRequest(
+                                context: context,
+                                pickAddress: requestController
+                                    .pickLocationController.text,
+                                dropAddress: requestController
+                                    .dropLocationController.text,
+                                pickLocation: GeoPoint(
+                                  requestController.pickLatLng!.latitude,
+                                  requestController.pickLatLng!.longitude,
+                                ),
+                                dropLocation: GeoPoint(
+                                  requestController.dropLatLng!.latitude,
+                                  requestController.dropLatLng!.longitude,
+                                ),
+                                distance: totalDistance,
+                                deliveryFee: price,
+                              );
+                            }
+                            requestController.titleController.clear();
+                            requestController.descriptionController.clear();
+                            requestController.priceController.clear();
+                            requestController.pickLocationController.clear();
+                            requestController.dropLocationController.clear();
+
+                            // if (requestController.requestImage != null) {
+
+                            // } else {
+                            //   Get.snackbar("Alert",
+                            //       "Please Select image of your product");
+                            // }
+                          })
+                    ],
                   ),
-                ))),
+                ),
+              )),
+        ),
       ),
     );
   }

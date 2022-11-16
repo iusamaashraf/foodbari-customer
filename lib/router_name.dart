@@ -64,16 +64,16 @@ class RouteNames {
         return MaterialPageRoute(builder: (_) => const SetpasswordScreen());
 
       case RouteNames.notificationScreen:
-        return MaterialPageRoute(builder: (_) => const NotificationScreen());
-      case RouteNames.messageScreen:
-        return MaterialPageRoute(builder: (_) => const MessageScreen());
-      case RouteNames.chatListScreen:
-        return MaterialPageRoute(builder: (_) => const ChatListScreen());
+        return MaterialPageRoute(builder: (_) => NotificationScreen());
+      // case RouteNames.messageScreen:
+      //   return MaterialPageRoute(builder: (_) => const MessageScreen());
+      // case RouteNames.chatListScreen:
+      //   return MaterialPageRoute(builder: (_) => const ChatListScreen());
       case RouteNames.orderScreen:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      case RouteNames.orderDetailsPage:
-        final productList = settings.arguments as List<ProductModel>;
-        return MaterialPageRoute(builder: (_) => OrderHistoryScreen());
+      // case RouteNames.orderDetailsPage:
+      //   final productList = settings.arguments as List<ProductModel>;
+      //   return MaterialPageRoute(builder: (_) => OrderHistoryScreen());
       case RouteNames.orderTrackingScreen:
         return MaterialPageRoute(builder: (_) => const OrderTrackingScreen());
 
@@ -81,8 +81,8 @@ class RouteNames {
         return MaterialPageRoute(builder: (_) => const TermsConditionScreen());
       case RouteNames.privacyPolicyScreen:
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
-      case RouteNames.faqScreen:
-        return MaterialPageRoute(builder: (_) => const FaqScreen());
+      // case RouteNames.faqScreen:
+      //   return MaterialPageRoute(builder: (_) => const FaqScreen());
       case RouteNames.aboutUsScreen:
         return MaterialPageRoute(builder: (_) => const AboutUsScreen());
       case RouteNames.contactUsScreen:

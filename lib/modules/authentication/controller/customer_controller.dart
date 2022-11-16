@@ -17,6 +17,7 @@ import 'package:location/location.dart';
 // lutte
 class CustomerController extends GetxController {
   final auth = FirebaseAuth.instance;
+  RxInt notifyCounter = 0.obs;
   final firebaseFirestore = FirebaseFirestore.instance;
   Rxn<CustomerModel> customerModel = Rxn<CustomerModel>();
   File? customerImage;
@@ -45,49 +46,58 @@ class CustomerController extends GetxController {
       required String email,
       required String password,
       context}) async {
-    Utils.showLoadingDialog(context, text: "Registration...");
+    if (name.isNotEmpty && email.isNotEmpty && password.isNotEmpty) {
+      Utils.showLoadingDialog(context, text: "Registration...");
+
+      Map<String, dynamic> userInfo = {
+        'name': name,
+        'email': email,
+        'location': const GeoPoint(0.0, 0.0),
+        'profileImage': "",
+        "address": "",
+        "phone": "",
+        // "tokenId": tokenId,
+      };
+      await auth
+          .createUserWithEmailAndPassword(
+              email: email.trim(), password: password.trim())
+          .then((value) async {
+        await firebaseFirestore
+            .collection('Customer')
+            .doc(value.user!.uid)
+            .set(userInfo)
+            .then((value) {
+          Get.back();
+          Get.offAll(() => const MainPage());
+        });
+      }).catchError((e) {
+        Get.back();
+        Get.snackbar('Error', e.toString());
+      });
+    } else {
+      Get.snackbar('Error creating account', 'Please enter all the fields');
+    }
+
     // var status = await OneSignal.shared.getDeviceState();
     // String tokenId = status!.userId!;
-
-    Map<String, dynamic> userInfo = {
-      'name': name,
-      'email': email,
-      'location': const GeoPoint(0.0, 0.0),
-      'profileImage': "",
-      "address": "",
-      "phone": "",
-      // "tokenId": tokenId,
-    };
-    await auth
-        .createUserWithEmailAndPassword(
-            email: email.trim(), password: password.trim())
-        .then((value) async {
-      await firebaseFirestore
-          .collection('Customer')
-          .doc(value.user!.uid)
-          .set(userInfo)
-          .then((value) {
-        Get.back();
-        Get.offAll(() => const MainPage());
-      });
-    }).catchError((e) {
-      Get.back();
-      Get.snackbar('Error', e.toString());
-    });
   }
 
   // <<<<<<<<===============login account function =================>>>>>>>>
 
   void login(String email, String password, context) async {
     try {
-      Utils.showLoadingDialog(context, text: "Login...");
-      await auth
-          .signInWithEmailAndPassword(
-              email: email.trim(), password: password.trim())
-          .then((value) {
-        Get.back();
-        Get.offAll(() => const MainPage());
-      });
+      if (email.isNotEmpty && password.isNotEmpty) {
+        Utils.showLoadingDialog(context, text: "Login...");
+        await auth
+            .signInWithEmailAndPassword(
+                email: email.trim(), password: password.trim())
+            .then((value) {
+          Get.back();
+          Get.offAll(() => const MainPage());
+        });
+      } else {
+        Get.snackbar('Error Logging in', 'Plase enter all fields');
+      }
     } catch (e) {
       Get.back();
       Get.snackbar("Alert", e.toString().split("] ").last);
@@ -96,13 +106,18 @@ class CustomerController extends GetxController {
 
   // <<<<<<<<===============forgot account function =================>>>>>>>>
   void forgotPassword(String email, context) async {
-    Utils.showLoadingDialog(context, text: "Sending verification link...");
     try {
-      await auth.sendPasswordResetEmail(email: email.trim()).then((value) {
-        Get.snackbar('Link sent succcessfully',
-            'Please check your email to reset password');
-        Get.to(() => const AuthenticationScreen());
-      });
+      if (email.isNotEmpty) {
+        Utils.showLoadingDialog(context, text: "Sending verification link...");
+        await auth.sendPasswordResetEmail(email: email.trim()).then((value) {
+          Get.snackbar('Link sent succcessfully',
+              'Please check your email to reset password');
+          Get.to(() => const AuthenticationScreen());
+        });
+      } else {
+        Get.snackbar(
+            "Recover Password error", "Please enter email to recover password");
+      }
     } catch (e) {
       Get.back();
       Get.snackbar('Error', e.toString().split("] ").last);
@@ -132,8 +147,7 @@ class CustomerController extends GetxController {
   void updateProfile({
     required String name,
     required String phone,
-    // required String image,
-
+    required String image,
     required context,
   }) async {
     Utils.showLoadingDialog(context, text: "Updating...");
@@ -147,7 +161,7 @@ class CustomerController extends GetxController {
       Map<String, dynamic> userInfo = {
         'phone': phone,
         'name': name,
-        // 'profileImage': customerImage == null ? image : url,
+        'profileImage': customerImage == null ? image : url,
       };
       await firebaseFirestore
           .collection('Customer')
@@ -266,11 +280,11 @@ class CustomerController extends GetxController {
     var shopAddress = placemarks.first;
     customerAddress.value = "${shopAddress.subLocality}"
         " ${shopAddress.street}"
-        ", ${shopAddress.locality}"
+        " ${shopAddress.locality}"
         ", ${shopAddress.subLocality}"
         ", ${shopAddress.subAdministrativeArea}"
-        ", ${shopAddress.administrativeArea}"
-        ", ${shopAddress.thoroughfare}"
+        // ", ${shopAddress.administrativeArea}"
+        // ", ${shopAddress.thoroughfare}"
         ", ${shopAddress.country}";
     customerPlaceName.value = shopAddress.subLocality!;
     return shopAddress;

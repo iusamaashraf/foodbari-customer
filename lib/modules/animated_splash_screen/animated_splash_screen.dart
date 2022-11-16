@@ -3,7 +3,9 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:foodbari_deliver_app/location_picker/location_picker_page.dart';
 import 'package:foodbari_deliver_app/location_picker/select_location.dart';
+import 'package:foodbari_deliver_app/map_picker/pick_location_screen.dart';
 import 'package:foodbari_deliver_app/map_screen.dart';
+import 'package:foodbari_deliver_app/modules/animated_splash_screen/bottom_sheet.dart';
 import 'package:foodbari_deliver_app/root.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -29,8 +31,9 @@ class _SplashScreenState extends State<AnimatedSplashScreen>
   }
 
   void navigationPage() {
-    // Get.to(() => LocationSearch(scaffoldKey: _scaffoldkey, onSelected: () {}));
     Get.offAll(() => RootCustomer());
+
+    //  Get.to(() => Pdf());
   }
 
   @override
@@ -96,7 +99,7 @@ class _SplashScreenState extends State<AnimatedSplashScreen>
             top: size.height * 0.65,
             child: AnimatedTextKit(
               animatedTexts: [
-                WavyAnimatedText('Delivery app',
+                WavyAnimatedText('Customer App',
                     textStyle: TextStyle(
                         color: Colors.redAccent,
                         fontSize: size.height * 0.03,

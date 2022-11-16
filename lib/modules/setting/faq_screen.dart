@@ -31,7 +31,6 @@ class _FaqScreenState extends State<FaqScreen> {
             flexibleSpace: FaqAppBar(height: appBarHeight),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 30)),
-
           SliverToBoxAdapter(
             child: ExpansionPanelList(
               expansionCallback: ((panelIndex, isExpanded) {
@@ -63,7 +62,7 @@ class _FaqScreenState extends State<FaqScreen> {
                   )
                   .toList(),
             ),
-          )
+          ),
           // SliverList(
           //   delegate: SliverChildBuilderDelegate(
           //     (context, index) {

@@ -83,33 +83,33 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: reEnterPasswordController,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                if (reEnterPasswordController.text != passwordController.text) {
-                  return 'Password does not match';
-                }
-                return 'Re-Enter Password';
-              }
-              return null;
-            },
-            obscureText: !_passwordVisible,
-            decoration: InputDecoration(
-              hintText: 'Re-Enter Password',
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                  color: grayColor,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _passwordVisible = !_passwordVisible;
-                  });
-                },
-              ),
-            ),
-          ),
+          // TextFormField(
+          //   controller: reEnterPasswordController,
+          //   validator: (value) {
+          //     if (value == null || value.isEmpty) {
+          //       if (reEnterPasswordController.text != passwordController.text) {
+          //         return 'Password does not match';
+          //       }
+          //       return 'Re-Enter Password';
+          //     }
+          //     return null;
+          //   },
+          //   obscureText: !_passwordVisible,
+          //   decoration: InputDecoration(
+          //     hintText: 'Re-Enter Password',
+          //     suffixIcon: IconButton(
+          //       icon: Icon(
+          //         _passwordVisible ? Icons.visibility : Icons.visibility_off,
+          //         color: grayColor,
+          //       ),
+          //       onPressed: () {
+          //         setState(() {
+          //           _passwordVisible = !_passwordVisible;
+          //         });
+          //       },
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 8),
           _buildRememberMe(),
           const SizedBox(height: 25),
@@ -122,15 +122,15 @@ class _SignUpFormState extends State<SignUpForm> {
                     password: passwordController.text,
                     context: context);
               }),
-          const SizedBox(height: 16),
-          const Text(
-            'Sign Up With Social',
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          const SocialButtons(),
-          const SizedBox(height: 28),
-          const GuestButton(),
+          // const SizedBox(height: 16),
+          // const Text(
+          //   'Sign Up With Social',
+          //   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+          // ),
+          // const SizedBox(height: 12),
+          // const SocialButtons(),
+          // const SizedBox(height: 28),
+          // const GuestButton(),
         ],
       ),
     );

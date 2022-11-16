@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:foodbari_deliver_app/modules/authentication/authentication_screen.dart';
 import 'package:foodbari_deliver_app/modules/authentication/controller/customer_controller.dart';
 import 'package:foodbari_deliver_app/modules/authentication/widgets/sign_in_form.dart';
+import 'package:foodbari_deliver_app/modules/setting/faq_screen.dart';
 import 'package:get/get.dart';
 import '../../router_name.dart';
 import '../../utils/k_images.dart';
@@ -32,27 +33,27 @@ class ProfileScreen extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate(
                 [
-                  ListTile(
-                    minLeadingWidth: 0,
-                    onTap: () {
-                      Navigator.pushNamed(
-                          context, RouteNames.notificationScreen);
-                    },
-                    contentPadding: EdgeInsets.zero,
-                    leading: const CustomImage(
-                        path: Kimages.profileNotificationIcon),
-                    title: const Text('Notification',
-                        style: TextStyle(fontSize: 16)),
-                  ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, RouteNames.chatListScreen);
-                    },
-                    minLeadingWidth: 0,
-                    contentPadding: EdgeInsets.zero,
-                    leading: const CustomImage(path: Kimages.profileChatIcon),
-                    title: const Text('Chats', style: TextStyle(fontSize: 16)),
-                  ),
+                  // ListTile(
+                  //   minLeadingWidth: 0,
+                  //   onTap: () {
+                  //     Navigator.pushNamed(
+                  //         context, RouteNames.notificationScreen);
+                  //   },
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading: const CustomImage(
+                  //       path: Kimages.profileNotificationIcon),
+                  //   title: const Text('Notification',
+                  //       style: TextStyle(fontSize: 16)),
+                  // ),
+                  // ListTile(
+                  //   onTap: () {
+                  //     Navigator.pushNamed(context, RouteNames.chatListScreen);
+                  //   },
+                  //   minLeadingWidth: 0,
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading: const CustomImage(path: Kimages.profileChatIcon),
+                  //   title: const Text('Chats', style: TextStyle(fontSize: 16)),
+                  // ),
                   ListTile(
                     onTap: () {
                       Navigator.pushNamed(
@@ -79,7 +80,8 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   ListTile(
                     onTap: () {
-                      Navigator.pushNamed(context, RouteNames.faqScreen);
+                      Get.to(() => FaqScreen());
+                      // Navigator.pushNamed(context, RouteNames.faqScreen);
                     },
                     minLeadingWidth: 0,
                     contentPadding: EdgeInsets.zero,
@@ -97,23 +99,23 @@ class ProfileScreen extends StatelessWidget {
                     title:
                         const Text('About Us', style: TextStyle(fontSize: 16)),
                   ),
-                  ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, RouteNames.contactUsScreen);
-                    },
-                    minLeadingWidth: 0,
-                    contentPadding: EdgeInsets.zero,
-                    leading:
-                        const CustomImage(path: Kimages.profileContactIcon),
-                    title: const Text('Contact Us',
-                        style: TextStyle(fontSize: 16)),
-                  ),
-                  const ListTile(
-                    minLeadingWidth: 0,
-                    contentPadding: EdgeInsets.zero,
-                    leading: CustomImage(path: Kimages.profileAppInfoIcon),
-                    title: Text('App Info', style: TextStyle(fontSize: 16)),
-                  ),
+                  // ListTile(
+                  //   onTap: () {
+                  //     Navigator.pushNamed(context, RouteNames.contactUsScreen);
+                  //   },
+                  //   minLeadingWidth: 0,
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading:
+                  //       const CustomImage(path: Kimages.profileContactIcon),
+                  //   title: const Text('Contact Us',
+                  //       style: TextStyle(fontSize: 16)),
+                  // ),
+                  // const ListTile(
+                  //   minLeadingWidth: 0,
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading: CustomImage(path: Kimages.profileAppInfoIcon),
+                  //   title: Text('App Info', style: TextStyle(fontSize: 16)),
+                  // ),
                   ListTile(
                     onTap: () {
                       // Navigator.of(context)

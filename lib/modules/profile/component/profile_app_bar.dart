@@ -159,15 +159,10 @@ class _ProfileAppBarState extends State<ProfileAppBar> {
         children: [
           SizedBox(height: statusbar),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const CustomImage(
-                path: Kimages.logoIcon,
-                width: 150,
-                height: 51,
-                color: Colors.white,
-              ),
+             
               Obx(
                 () => Row(
                   children: [
